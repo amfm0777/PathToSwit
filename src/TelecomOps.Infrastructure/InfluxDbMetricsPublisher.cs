@@ -29,14 +29,14 @@ public class InfluxDbMetricsPublisher : IMetricsPublisher
             .Tag("status", telemetryEvent.Status.ToString())
             .Field("latency_ms", telemetryEvent.LatencyMs)
             .Field("throughput_mbps", telemetryEvent.ThroughputMbps)
-            .Timestamp(telemetryEvent.Timestamp, WritePrecision.Ns);
+            .Timestamp(telemetryEvent.Timestamp, WritePrecision.Ms);
 
         if (!string.IsNullOrEmpty(telemetryEvent.AdditionalData))
         {
             point = point.Field("additional_data", telemetryEvent.AdditionalData);
         }
 
-        using var writeApi = _client.GetWriteApi();
-        writeApi.WritePoint(point, _bucket, _org);
+        var writeApi = _client.GetWriteApiAsync();
+        await writeApi.WritePointAsync(point, _bucket, _org);
     }
 }
