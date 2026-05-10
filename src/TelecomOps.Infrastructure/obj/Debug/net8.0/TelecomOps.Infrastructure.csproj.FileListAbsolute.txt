@@ -1,0 +1,15 @@
+C:\Users\azulp\PathToSwit\src\TelecomOps.Infrastructure\bin\Debug\net8.0\TelecomOps.Infrastructure.deps.json
+C:\Users\azulp\PathToSwit\src\TelecomOps.Infrastructure\bin\Debug\net8.0\TelecomOps.Infrastructure.dll
+C:\Users\azulp\PathToSwit\src\TelecomOps.Infrastructure\bin\Debug\net8.0\TelecomOps.Infrastructure.pdb
+C:\Users\azulp\PathToSwit\src\TelecomOps.Infrastructure\bin\Debug\net8.0\TelecomOps.Core.dll
+C:\Users\azulp\PathToSwit\src\TelecomOps.Infrastructure\bin\Debug\net8.0\TelecomOps.Core.pdb
+C:\Users\azulp\PathToSwit\src\TelecomOps.Infrastructure\obj\Debug\net8.0\TelecomOps.Infrastructure.csproj.AssemblyReference.cache
+C:\Users\azulp\PathToSwit\src\TelecomOps.Infrastructure\obj\Debug\net8.0\TelecomOps.Infrastructure.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\azulp\PathToSwit\src\TelecomOps.Infrastructure\obj\Debug\net8.0\TelecomOps.Infrastructure.AssemblyInfoInputs.cache
+C:\Users\azulp\PathToSwit\src\TelecomOps.Infrastructure\obj\Debug\net8.0\TelecomOps.Infrastructure.AssemblyInfo.cs
+C:\Users\azulp\PathToSwit\src\TelecomOps.Infrastructure\obj\Debug\net8.0\TelecomOps.Infrastructure.csproj.CoreCompileInputs.cache
+C:\Users\azulp\PathToSwit\src\TelecomOps.Infrastructure\obj\Debug\net8.0\TelecomO.1726D26D.Up2Date
+C:\Users\azulp\PathToSwit\src\TelecomOps.Infrastructure\obj\Debug\net8.0\TelecomOps.Infrastructure.dll
+C:\Users\azulp\PathToSwit\src\TelecomOps.Infrastructure\obj\Debug\net8.0\refint\TelecomOps.Infrastructure.dll
+C:\Users\azulp\PathToSwit\src\TelecomOps.Infrastructure\obj\Debug\net8.0\TelecomOps.Infrastructure.pdb
+C:\Users\azulp\PathToSwit\src\TelecomOps.Infrastructure\obj\Debug\net8.0\ref\TelecomOps.Infrastructure.dll

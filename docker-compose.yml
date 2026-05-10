@@ -1,0 +1,162 @@
+services:
+
+  # ─────────────────────────────────────────
+  # API — ASP.NET Core 8
+  # ─────────────────────────────────────────
+  api:
+    build:
+      context: .
+      dockerfile: src/TelecomOps.Api/Dockerfile
+    container_name: telecomops-api
+    ports:
+      - "5000:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__Default: "Host=postgres;Port=5432;Database=telecomops;Username=telecom;Password=telecom123"
+      InfluxDb__Url: "http://influxdb:8086"
+      InfluxDb__Token: "telecomops-token"
+      InfluxDb__Org: "telecomops"
+      InfluxDb__Bucket: "metrics"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      influxdb:
+        condition: service_healthy
+    networks:
+      - telecomops-net
+    restart: unless-stopped
+
+  # ─────────────────────────────────────────
+  # Worker — Background Service
+  # ─────────────────────────────────────────
+  worker:
+    build:
+      context: .
+      dockerfile: src/TelecomOps.Worker/Dockerfile
+    container_name: telecomops-worker
+    environment:
+      DOTNET_ENVIRONMENT: Development
+      ConnectionStrings__Default: "Host=postgres;Port=5432;Database=telecomops;Username=telecom;Password=telecom123"
+      InfluxDb__Url: "http://influxdb:8086"
+      InfluxDb__Token: "telecomops-token"
+      InfluxDb__Org: "telecomops"
+      InfluxDb__Bucket: "metrics"
+      Worker__IntervalSeconds: "5"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      influxdb:
+        condition: service_healthy
+    networks:
+      - telecomops-net
+    restart: unless-stopped
+
+  # ─────────────────────────────────────────
+  # PostgreSQL 16
+  # ─────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: telecomops-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: telecomops
+      POSTGRES_USER: telecom
+      POSTGRES_PASSWORD: telecom123
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U telecom -d telecomops"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - telecomops-net
+    restart: unless-stopped
+
+  # ─────────────────────────────────────────
+  # InfluxDB 2
+  # ─────────────────────────────────────────
+  influxdb:
+    image: influxdb:2.7-alpine
+    container_name: telecomops-influxdb
+    ports:
+      - "8086:8086"
+    environment:
+      DOCKER_INFLUXDB_INIT_MODE: setup
+      DOCKER_INFLUXDB_INIT_USERNAME: admin
+      DOCKER_INFLUXDB_INIT_PASSWORD: admin123456
+      DOCKER_INFLUXDB_INIT_ORG: telecomops
+      DOCKER_INFLUXDB_INIT_BUCKET: metrics
+      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: telecomops-token
+    volumes:
+      - influxdb-data:/var/lib/influxdb2
+    healthcheck:
+      test: ["CMD", "influx", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - telecomops-net
+    restart: unless-stopped
+
+  # ─────────────────────────────────────────
+  # Prometheus
+  # ─────────────────────────────────────────
+  prometheus:
+    image: prom/prometheus:v2.51.0
+    container_name: telecomops-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./infra/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.enable-lifecycle"
+    depends_on:
+      - api
+    networks:
+      - telecomops-net
+    restart: unless-stopped
+
+  # ─────────────────────────────────────────
+  # Grafana
+  # ─────────────────────────────────────────
+  grafana:
+    image: grafana/grafana:10.4.0
+    container_name: telecomops-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_PATHS_PROVISIONING: /etc/grafana/provisioning
+    volumes:
+      - ./infra/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./infra/grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - grafana-data:/var/lib/grafana
+    depends_on:
+      - prometheus
+      - influxdb
+    networks:
+      - telecomops-net
+    restart: unless-stopped
+
+# ─────────────────────────────────────────
+# Volumes
+# ─────────────────────────────────────────
+volumes:
+  postgres-data:
+  influxdb-data:
+  prometheus-data:
+  grafana-data:
+
+# ─────────────────────────────────────────
+# Network
+# ─────────────────────────────────────────
+networks:
+  telecomops-net:
+    driver: bridge
